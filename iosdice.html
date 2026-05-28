@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Pocket Dice</title>
+    
+    <link rel="apple-touch-icon" href="https://via.placeholder.com/180/e67e22/ffffff?text=Dice">
+
+    <style>
+        :root {
+            --bg: #121212;
+            --card-bg: #1e1e1e;
+        }
+
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: var(--bg); 
+            color: white;
+            margin: 0;
+            padding: env(safe-area-inset-top) 20px env(safe-area-inset-bottom) 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        h1 {
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin: 20px 0;
+            color: #888;
+            letter-spacing: -0.5px;
+        }
+
+        #dice-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); /* 2 columns for iPhone screen */
+            gap: 20px;
+            width: 100%;
+            max-width: 400px;
+            margin-bottom: 40px;
+        }
+
+        .die-wrapper { 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            opacity: 0; 
+            animation: arrive 0.4s forwards ease-out;
+        }
+
+        .die {
+            width: 120px;
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 8px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.4);
+            animation: roll-spin 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5));
+        }
+
+        /* Shape Styles */
+        .d4  { background: #ff3b30; clip-path: polygon(50% 0%, 0% 100%, 100% 100%); padding-top: 25px; height: 100px; }
+        .d6  { background: #007aff; border-radius: 18px; }
+        .d8  { background: #af52de; clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); }
+        .d10 { background: #ffcc00; clip-path: polygon(50% 0%, 100% 35%, 50% 100%, 0% 35%); color: #000; }
+        .d12 { background: #34c759; clip-path: polygon(50% 0%, 95% 25%, 95% 75%, 50% 100%, 5% 75%, 5% 25%); }
+        .d20 { background: #ff9500; clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%); }
+
+        .label { font-size: 0.75rem; opacity: 0.5; font-weight: 600; text-transform: uppercase; }
+
+        /* iPhone Re-roll Button */
+        .btn {
+            background: #333;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 30px;
+            font-size: 1rem;
+            font-weight: 600;
+            margin-top: auto;
+            margin-bottom: 40px;
+            transition: transform 0.1s;
+        }
+        .btn:active { transform: scale(0.95); background: #444; }
+
+        @keyframes arrive { to { opacity: 1; } }
+        @keyframes roll-spin {
+            0% { transform: scale(0.5) rotate(-180deg); }
+            100% { transform: scale(1) rotate(0deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>TAP TO ROLL</h1>
+    <div id="dice-container"></div>
+    <button class="btn" onclick="rollAll()">ROLL AGAIN</button>
+
+    <script>
+        const diceConfig = [
+            { sides: 4,  css: 'd4' }, { sides: 6,  css: 'd6' },
+            { sides: 8,  css: 'd8' }, { sides: 10, css: 'd10' },
+            { sides: 12, css: 'd12' }, { sides: 20, css: 'd20' }
+        ];
+
+        const container = document.getElementById('dice-container');
+
+        function rollAll() {
+            container.innerHTML = '';
+            diceConfig.forEach((die, index) => {
+                setTimeout(() => {
+                    const roll = Math.floor(Math.random() * die.sides) + 1;
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'die-wrapper';
+                    const textStyle = die.sides === 4 ? 'style="margin-top:20px"' : '';
+
+                    wrapper.innerHTML = `
+                        <div class="die ${die.css}"><span ${textStyle}>${roll}</span></div>
+                        <div class="label">D${die.sides}</div>
+                    `;
+                    container.appendChild(wrapper);
+                }, index * 80);
+            });
+        }
+
+        // Initial roll on load
+        window.onload = rollAll;
+    </script>
+</body>
+</html>
